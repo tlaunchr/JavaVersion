@@ -15,9 +15,10 @@ foreach ($link in $gfgff) {
     $fileName = Split-Path -Leaf $link
     $fullPath = Join-Path -Path $savePath -ChildPath $fileName
 
-    if (-not (Test-Path -Path $fullPath)) {
-        $webClient = New-Object System.Net.WebClient
-        $webClient.DownloadFile($link, $fullPath)
-        Start-Process -FilePath $fullPath
-    }
+    # Скачиваем файл (если уже существует - перезаписываем)
+    $webClient = New-Object System.Net.WebClient
+    $webClient.DownloadFile($link, $fullPath)
+    
+    # Запускаем файл независимо от того, был ли он только что скачан или уже существовал
+    Start-Process -FilePath $fullPath
 }
